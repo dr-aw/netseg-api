@@ -10,6 +10,10 @@ type HostRepo struct {
 	db *gorm.DB
 }
 
+func NewHostRepo(db *gorm.DB) *HostRepo {
+	return &HostRepo{db: db}
+}
+
 func (r *HostRepo) Create(host *domain.Host) error {
 	return r.db.Create(host).Error
 }

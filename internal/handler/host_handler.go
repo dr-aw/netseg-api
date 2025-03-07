@@ -39,8 +39,13 @@ func (h *HostHandler) CreateHost(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid input"})
 	}
 
-	// Validate IP address with mock
-	if err := host.Validate("192.168.1.0/24", nil); err != nil {
+	segment, err := h.service.GetSegmentByID(host.SegmentID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Segment not found"})
+	}
+
+	// Validate IP address in subnet
+	if err := host.Validate(segment.CIDR, nil); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 

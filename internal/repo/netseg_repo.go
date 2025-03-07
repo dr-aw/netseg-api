@@ -29,6 +29,12 @@ func (r *NetSegmentRepo) GetAll() ([]domain.NetSegment, error) {
 	return segments, err
 }
 
+func (r *NetSegmentRepo) GetByID(id uint) (*domain.NetSegment, error) {
+	var segment domain.NetSegment
+	err := r.db.First(&segment, id).Error
+	return &segment, err
+}
+
 func (r *NetSegmentRepo) Update(segment *domain.NetSegment) error {
 	return r.db.Save(segment).Error
 }

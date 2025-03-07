@@ -29,3 +29,7 @@ func (s *NetSegmentService) GetAllNetSegments() ([]domain.NetSegment, error) {
 func (s *NetSegmentService) UpdateNetSegment(segment *domain.NetSegment) error {
 	return s.repo.Update(segment)
 }
+
+func (s *NetSegmentService) GetSegmentByID(id uint) (*domain.NetSegment, error) {
+	return s.repo.GetByID(id)
+}

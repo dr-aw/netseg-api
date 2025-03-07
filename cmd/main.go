@@ -15,9 +15,17 @@ func main() {
 	e := echo.New()
 
 	netSegRepo := repo.NewNetSegmentRepo(db)
+	hostRepo := repo.NewHostRepo(db)
+
 	netSegService := service.NewNetSegmentService(netSegRepo)
+	hostService := service.NewHostService(hostRepo, netSegService)
+
 	netSegHandler := handler.NewNetSegmentHandler(netSegService)
+	hostHandler := handler.NewHostHandler(hostService)
 
 	handler.RegisterNetSegmentRoutes(e, netSegHandler)
+	handler.RegisterHostRoutes(e, hostHandler)
+
+	// start the server
 	e.Logger.Fatal(e.Start(":8080"))
 }
