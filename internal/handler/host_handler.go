@@ -38,6 +38,13 @@ func (h *HostHandler) CreateHost(c echo.Context) error {
 	if err := c.Bind(&host); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid input"})
 	}
+
+	// Validate IP address with mock
+	if err := host.Validate("192.168.1.0/24", nil); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	// Save host
 	if err := h.service.CreateHost(&host); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create host"})
 	}
