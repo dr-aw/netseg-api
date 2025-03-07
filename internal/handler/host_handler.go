@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/labstack/echo/v4"
+
 	"github.com/dr-aw/netseg-api/internal/domain"
 	"github.com/dr-aw/netseg-api/internal/service"
-	"github.com/labstack/echo/v4"
 )
 
 type HostHandler struct {

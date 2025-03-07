@@ -25,7 +25,7 @@ func (r *NetSegmentRepo) Create(segment *domain.NetSegment) error {
 
 func (r *NetSegmentRepo) GetAll() ([]domain.NetSegment, error) {
 	var segments []domain.NetSegment
-	err := r.db.Find(segments).Error
+	err := r.db.Find(&segments).Error
 	return segments, err
 }
 

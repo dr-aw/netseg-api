@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/dr-aw/netseg-api/internal/domain"
 	"github.com/dr-aw/netseg-api/internal/repo"
 )
@@ -18,6 +20,9 @@ func (s *NetSegmentService) CreateNetSegment(segment *domain.NetSegment) error {
 }
 
 func (s *NetSegmentService) GetAllNetSegments() ([]domain.NetSegment, error) {
+	if s.repo == nil {
+		return nil, fmt.Errorf("repository is not initialized")
+	}
 	return s.repo.GetAll()
 }
 
