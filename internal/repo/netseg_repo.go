@@ -1,19 +1,26 @@
 package repo
 
 import (
+	"fmt"
 	"log"
 
-	"github.com/dr-aw/netseg-api/internal/domain"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/dr-aw/netseg-api/config"
+	"github.com/dr-aw/netseg-api/internal/domain"
 )
 
 type NetSegmentRepo struct {
 	db *gorm.DB
 }
 
+func NewNetSegmentRepo(db *gorm.DB) *NetSegmentRepo {
+	return &NetSegmentRepo{db: db}
+}
+
 func (r *NetSegmentRepo) Create(segment *domain.NetSegment) error {
-	return nil
+	return r.db.Create(segment).Error
 }
 
 func (r *NetSegmentRepo) GetAll() ([]domain.NetSegment, error) {
@@ -22,13 +29,21 @@ func (r *NetSegmentRepo) GetAll() ([]domain.NetSegment, error) {
 	return segments, err
 }
 
-func InitDB() *gorm.DB {
-	dsn := "host=localhost user=postgres password=password123 dbname=netseg port=5432"
+func (r *NetSegmentRepo) Update(segment *domain.NetSegment) error {
+	return r.db.Save(segment).Error
+}
+
+func InitDB(cfg *config.Config) *gorm.DB {
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
+		cfg.DBHost, cfg.DBUser, cfg.DBPassword, cfg.DBName, cfg.DBPort,
+	)
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to connect to database", err)
+		log.Fatal("Failed to connect to database:", err)
 	}
-	log.Println("db connected successfully")
-	// migration
+
+	db.AutoMigrate(&domain.NetSegment{}, &domain.Host{})
 	return db
 }

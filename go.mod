@@ -1,8 +1,11 @@
 module github.com/dr-aw/netseg-api
 
-go 1.23.1
+go 1.23.0
+
+toolchain go1.23.1
 
 require (
+	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.13.3
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12

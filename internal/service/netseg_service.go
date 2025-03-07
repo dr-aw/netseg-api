@@ -20,3 +20,7 @@ func (s *NetSegmentService) CreateNetSegment(segment *domain.NetSegment) error {
 func (s *NetSegmentService) GetAllNetSegments() ([]domain.NetSegment, error) {
 	return s.repo.GetAll()
 }
+
+func (s *NetSegmentService) UpdateNetSegment(segment *domain.NetSegment) error {
+	return s.repo.Update(segment)
+}
