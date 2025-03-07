@@ -12,6 +12,7 @@ type Host struct {
 	MAC       string `gorm:"unique;not null"`
 	Status    string `gorm:"not null"`
 	SegmentID uint   `gorm:"not null;index"`
+	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
@@ -33,7 +34,7 @@ func isIPInSubnet(ip, cidr string) (bool, error) {
 	return subnet.Contains(ipAddr), nil
 }
 
-func (h *Host) Validate(segmentCIDR string, existingIPs []string) error {
+func (h *Host) Validate(segmentCIDR string, existingIPs []string) error { // Simple error (only one)
 	if !isValidIP(h.IPAddress) {
 		return errors.New("invalid IP address format")
 	}
