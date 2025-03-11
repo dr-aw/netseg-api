@@ -23,8 +23,7 @@ func main() {
 	netSegHandler := handler.NewNetSegmentHandler(netSegService)
 	hostHandler := handler.NewHostHandler(hostService)
 
-	handler.RegisterNetSegmentRoutes(e, netSegHandler)
-	handler.RegisterHostRoutes(e, hostHandler)
+	handler.RegisterRoutes(e, netSegHandler, hostHandler)
 
 	// start the server
 	e.Logger.Fatal(e.Start(":8080"))

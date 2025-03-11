@@ -88,14 +88,11 @@ GET /api/v1/hosts
 - **Clean Architecture**
 
 ## 📌 **To-Do**
-- Add more validation rules
 - Implement unit and integration tests
-- Refactor routes into separate files for better organization
 - Consider adding caching for quick uniqueness checks of IP addresses within a subnet and MAC addresses
 
 ## 💡 **Author**
-[Konstantin](https://github.com/dr-aw)
+[Konstantin Gunbin](https://github.com/dr-aw)
 
 ## 📜 **License**
 This project is licensed under the **MIT License**.
-

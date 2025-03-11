@@ -18,13 +18,6 @@ func NewNetSegmentHandler(service *service.NetSegmentService) *NetSegmentHandler
 	return &NetSegmentHandler{service: service}
 }
 
-func RegisterNetSegmentRoutes(e *echo.Echo, handler *NetSegmentHandler) {
-	api := e.Group("/api/v1")
-	api.GET("/segments", handler.GetAllNetSegments)
-	api.POST("/segments", handler.CreateNetSegment)
-	api.PUT("/segments/:id", handler.UpdateNetSegment)
-}
-
 func (h *NetSegmentHandler) GetAllNetSegments(c echo.Context) error {
 	segments, err := h.service.GetAllNetSegments()
 	if err != nil {

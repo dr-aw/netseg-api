@@ -18,13 +18,6 @@ func NewHostHandler(service *service.HostService) *HostHandler {
 	return &HostHandler{service: service}
 }
 
-func RegisterHostRoutes(e *echo.Echo, handler *HostHandler) {
-	api := e.Group("/api/v1")
-	api.GET("/hosts", handler.GetAllHosts)
-	api.POST("/hosts", handler.CreateHost)
-	api.PUT("/hosts/:id", handler.UpdateHost)
-}
-
 func (h *HostHandler) GetAllHosts(c echo.Context) error {
 	hosts, err := h.service.GetAllHosts()
 	if err != nil {
