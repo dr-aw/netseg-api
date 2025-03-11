@@ -34,9 +34,6 @@ func (s *HostService) CreateHost(host *domain.Host) error {
 }
 
 func (s *HostService) GetAllHosts() ([]domain.Host, error) {
-	if s.queryRepo == nil {
-		return nil, fmt.Errorf("repository is not initialized")
-	}
 	return s.queryRepo.GetAll()
 }
 
