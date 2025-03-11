@@ -1,5 +1,7 @@
 # NetSeg API
 
+It is a task solvation. English description [on this link](https://github.com/dr-aw/netseg-api/task.md).
+
 ## 📌 Description
 **NetSeg API** is a REST API service for managing network segments and hosts, built with **Golang**, **Echo**, and **PostgreSQL**.
 
