@@ -2,7 +2,7 @@
 
 This repository contains a test assignment for the Go Developer position.
 
-📌 **Test Assignment Details:** [TASK.md](TASK.md)
+📌 **Test Assignment Details:** [task.md](task.md)
 
 ## 📌 Description
 **NetSeg API** is a REST API service for managing network segments and hosts, built with **Golang**, **Echo**, and **PostgreSQL**.
