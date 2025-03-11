@@ -27,3 +27,18 @@ func (r *HostRepo) GetAll() ([]domain.Host, error) {
 func (r *HostRepo) Update(host *domain.Host) error {
 	return r.db.Save(host).Error
 }
+
+func (r *HostRepo) CountHostsBySegmentID(segmentID uint) (int, error) {
+	var count int64
+	err := r.db.Model(&domain.Host{}).Where("segment_id = ?", segmentID).Count(&count).Error
+	return int(count), err
+}
+
+func (r *HostRepo) GetByIPAddressAndSegment(ip string, segmentID uint) (*domain.Host, error) {
+	var host domain.Host
+	err := r.db.Where("ip_address = ? AND segment_id = ?", ip, segmentID).First(&host).Error
+	if err != nil {
+		return nil, err
+	}
+	return &host, nil
+}
