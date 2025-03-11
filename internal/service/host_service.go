@@ -51,6 +51,15 @@ func (s *HostService) validateHost(host *domain.Host) error {
 		return fmt.Errorf("segment with ID %d not found", host.SegmentID)
 	}
 
+	// Check if segment has reached max hosts
+	hostCount, err := s.repo.CountHostsBySegmentID(host.SegmentID)
+	if err != nil {
+		return fmt.Errorf("failed to count hosts in segment %d: %v", host.SegmentID, err)
+	}
+	if segment.MaxHosts > 0 && hostCount >= segment.MaxHosts {
+		return fmt.Errorf("cannot add host: segment %s has reached max_hosts limit (%d)", segment.CIDR, segment.MaxHosts)
+	}
+
 	// Is IP valid
 	if net.ParseIP(host.IPAddress) == nil {
 		return fmt.Errorf("invalid IP address format: %s", host.IPAddress)
