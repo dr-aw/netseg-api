@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"net"
+	"regexp"
 
 	"github.com/dr-aw/netseg-api/internal/domain"
 	"github.com/dr-aw/netseg-api/internal/repo"
@@ -17,31 +19,17 @@ func NewHostService(repo *repo.HostRepo, netSegService *NetSegmentService) *Host
 }
 
 func (s *HostService) CreateHost(host *domain.Host) error {
-	// Getting segment by ID that host belongs to
-	segment, err := s.netSegService.GetSegmentByID(host.SegmentID)
-	if err != nil {
-		return fmt.Errorf("segment not found: %w", err)
-	}
-
-	// Checking max_hosts limit
-	hostCount, err := s.repo.CountHostsBySegmentID(host.SegmentID)
-	if err != nil {
-		return fmt.Errorf("failed to count hosts: %w", err)
-	}
-	if hostCount >= segment.MaxHosts {
-		return fmt.Errorf("cannot add host: segment %s reached max_hosts limit (%d)", segment.CIDR, segment.MaxHosts)
-	}
-
-	// Checking if IP address already exists in the segment
-	existingHost, err := s.repo.GetByIPAddressAndSegment(host.IPAddress, host.SegmentID)
-	if err == nil && existingHost != nil {
-		return fmt.Errorf("IP address %s already exists in segment %s", host.IPAddress, segment.CIDR)
+	if err := s.validateHost(host); err != nil {
+		return err
 	}
 
 	return s.repo.Create(host)
 }
 
 func (s *HostService) GetAllHosts() ([]domain.Host, error) {
+	if s.repo == nil {
+		return nil, fmt.Errorf("repository is not initialized")
+	}
 	return s.repo.GetAll()
 }
 
@@ -50,5 +38,47 @@ func (s *HostService) GetSegmentByID(id uint) (*domain.NetSegment, error) {
 }
 
 func (s *HostService) UpdateHost(host *domain.Host) error {
+	if err := s.validateHost(host); err != nil {
+		return err
+	}
 	return s.repo.Update(host)
+}
+
+func (s *HostService) validateHost(host *domain.Host) error {
+	// Getting segment by ID that host belongs to
+	segment, err := s.netSegService.GetSegmentByID(host.SegmentID)
+	if err != nil {
+		return fmt.Errorf("segment with ID %d not found", host.SegmentID)
+	}
+
+	// Is IP valid
+	if net.ParseIP(host.IPAddress) == nil {
+		return fmt.Errorf("invalid IP address format: %s", host.IPAddress)
+	}
+
+	// Is IP in subnet
+	_, ipNet, _ := net.ParseCIDR(segment.CIDR)
+	if !ipNet.Contains(net.ParseIP(host.IPAddress)) {
+		return fmt.Errorf("IP %s is outside the segment subnet %s", host.IPAddress, segment.CIDR)
+	}
+
+	// mac format
+	macRegex := regexp.MustCompile(`^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$`)
+	if !macRegex.MatchString(host.MAC) {
+		return fmt.Errorf("invalid MAC address format: %s", host.MAC)
+	}
+
+	// Checking if IP address is already exists in the segment
+	existingHost, err := s.repo.GetByIPAddressAndSegment(host.IPAddress, host.SegmentID)
+	if err == nil && existingHost != nil && existingHost.ID != host.ID {
+		return fmt.Errorf("IP address %s is already in use in segment %s", host.IPAddress, segment.CIDR)
+	}
+
+	// Checking if MAC address is already exists
+	existingHost, err = s.repo.GetByMAC(host.MAC)
+	if err == nil && existingHost != nil && existingHost.ID != host.ID {
+		return fmt.Errorf("MAC address %s is already in use", host.MAC)
+	}
+
+	return nil
 }

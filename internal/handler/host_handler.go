@@ -51,7 +51,7 @@ func (h *HostHandler) CreateHost(c echo.Context) error {
 
 	// Save host
 	if err := h.service.CreateHost(&host); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create host"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create host", "details": err.Error()})
 	}
 	return c.JSON(http.StatusCreated, host)
 }
@@ -70,7 +70,7 @@ func (h *HostHandler) UpdateHost(c echo.Context) error {
 	host.ID = uint(id)
 
 	if err := h.service.UpdateHost(&host); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update host"})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update host", "details": err.Error()})
 	}
 	return c.JSON(http.StatusOK, host)
 }

@@ -7,11 +7,11 @@ import (
 )
 
 type Host struct {
-	ID        uint   `gorm:"primaryKey"`
-	IPAddress string `gorm:"type:varchar(15);not null"`
-	MAC       string `gorm:"type:varchar(17);unique;not null"`
-	Status    bool   `gorm:"not null"`
-	SegmentID uint   `gorm:"not null;index"`
+	ID        uint   `gorm:"primaryKey" json:"id"`
+	IPAddress string `gorm:"type:varchar(15);not null" json:"ip_address"`
+	MAC       string `gorm:"type:varchar(17);unique;index;not null" json:"mac"`
+	Status    bool   `gorm:"not null" json:"status"`
+	SegmentID uint   `gorm:"not null" json:"segment_id"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
