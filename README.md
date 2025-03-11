@@ -76,6 +76,16 @@ POST /api/v1/hosts
 }
 ```
 
+### ✅ Tests
+Use the following command to run tests:
+```sh
+go test -coverpkg=./internal/... -coverprofile=coverage.out ./tests ./internal/...
+```
+After you can make an HTML report:
+```sh
+go tool cover -html=coverage.out -o coverage.html
+```
+
 #### 📄 **Retrieve all Hosts**
 ```http
 GET /api/v1/hosts
@@ -88,7 +98,7 @@ GET /api/v1/hosts
 - **Clean Architecture**
 
 ## 📌 **To-Do**
-- Implement unit and integration tests
+- Add more unit and integration tests
 - Consider adding caching for quick uniqueness checks of IP addresses within a subnet and MAC addresses
 
 ## 💡 **Author**
