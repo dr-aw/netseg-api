@@ -17,7 +17,7 @@ func main() {
 	netSegRepo := repo.NewNetSegmentRepo(db)
 	hostRepo := repo.NewHostRepo(db)
 
-	netSegService := service.NewNetSegmentService(netSegRepo)
+	netSegService := service.NewNetSegmentService(netSegRepo, hostRepo)
 	hostService := service.NewHostService(hostRepo, netSegService)
 
 	netSegHandler := handler.NewNetSegmentHandler(netSegService)

@@ -11,12 +11,17 @@ import (
 )
 
 type NetSegmentService struct {
-	repo *repo.NetSegmentRepo
+	repo     *repo.NetSegmentRepo
+	hostRepo *repo.HostRepo
 }
 
-func NewNetSegmentService(repo *repo.NetSegmentRepo) *NetSegmentService {
-	return &NetSegmentService{repo: repo}
+func NewNetSegmentService(netSegRepo *repo.NetSegmentRepo, hostRepo *repo.HostRepo) *NetSegmentService {
+	return &NetSegmentService{
+		repo:     netSegRepo,
+		hostRepo: hostRepo,
+	}
 }
+
 
 func (s *NetSegmentService) CreateNetSegment(segment *domain.NetSegment) error {
 	if err := s.validateSegment(segment); err != nil {
@@ -34,6 +39,18 @@ func (s *NetSegmentService) GetAllNetSegments() ([]domain.NetSegment, error) {
 }
 
 func (s *NetSegmentService) UpdateNetSegment(segment *domain.NetSegment) error {
+
+	hostCount, err := s.hostRepo.CountHostsBySegmentID(segment.ID)
+	if err != nil {
+		return fmt.Errorf("failed to count hosts in segment %d: %v", segment.ID, err)
+	}
+
+	if segment.MaxHosts > 0 && segment.MaxHosts < hostCount {
+		return fmt.Errorf(
+			"cannot update max_hosts to %d: there are already %d hosts in this segment",
+			segment.MaxHosts, hostCount,
+		)
+	}
 	if err := s.validateSegment(segment); err != nil {
 		return err
 	}
