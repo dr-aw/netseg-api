@@ -35,6 +35,12 @@ func (r *NetSegmentRepo) GetByID(id uint) (*domain.NetSegment, error) {
 	return &segment, err
 }
 
+func (r *NetSegmentRepo) GetByCIDR(cidr string) (*domain.NetSegment, error) {
+	var segment domain.NetSegment
+	err := r.db.Where("cidr = ?", cidr).First(&segment).Error
+	return &segment, err
+}
+
 func (r *NetSegmentRepo) Update(segment *domain.NetSegment) error {
 	return r.db.Save(segment).Error
 }

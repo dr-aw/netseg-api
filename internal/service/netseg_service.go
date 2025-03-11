@@ -1,7 +1,10 @@
 package service
 
 import (
+	"errors"
 	"fmt"
+	"log"
+	"net"
 
 	"github.com/dr-aw/netseg-api/internal/domain"
 	"github.com/dr-aw/netseg-api/internal/repo"
@@ -16,6 +19,10 @@ func NewNetSegmentService(repo *repo.NetSegmentRepo) *NetSegmentService {
 }
 
 func (s *NetSegmentService) CreateNetSegment(segment *domain.NetSegment) error {
+	if err := s.validateSegment(segment); err != nil {
+		return err
+	}
+
 	return s.repo.Create(segment)
 }
 
@@ -27,9 +34,40 @@ func (s *NetSegmentService) GetAllNetSegments() ([]domain.NetSegment, error) {
 }
 
 func (s *NetSegmentService) UpdateNetSegment(segment *domain.NetSegment) error {
+	if err := s.validateSegment(segment); err != nil {
+		return err
+	}
 	return s.repo.Update(segment)
 }
 
 func (s *NetSegmentService) GetSegmentByID(id uint) (*domain.NetSegment, error) {
 	return s.repo.GetByID(id)
+}
+
+func (s *NetSegmentService) validateSegment(segment *domain.NetSegment) error {
+	// Checking CIDR
+	_, ipNet, err := net.ParseCIDR(segment.CIDR)
+	if err != nil {
+		return fmt.Errorf("invalid CIDR format: %s", segment.CIDR)
+	}
+
+	maskSize, _ := ipNet.Mask.Size()
+	possibleHosts := (1 << (32 - maskSize)) - 2 // 2 hosts always used by network and broadcast
+	log.Printf("Possible hosts in subnet: %d", possibleHosts)
+
+	// Checking max_hosts
+	if segment.MaxHosts <= 0 {
+		return errors.New("max_hosts must be greater than 0")
+	}
+	if segment.MaxHosts > possibleHosts {
+		return fmt.Errorf("max_hosts (%d) exceeds available IP addresses in subnet (%d)", segment.MaxHosts, possibleHosts)
+	}
+
+	// CIDR is unique
+	existingSegment, err := s.repo.GetByCIDR(segment.CIDR)
+	if err == nil && existingSegment != nil && existingSegment.ID != segment.ID {
+		return fmt.Errorf("CIDR %s already exists", segment.CIDR)
+	}
+
+	return nil
 }
