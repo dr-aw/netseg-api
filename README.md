@@ -1,6 +1,8 @@
 # NetSeg API
 
-📌 [Test Assignment (Wiki)](https://github.com/your-repo/wiki/TASK)
+This repository contains a test assignment for the Go Developer position.
+
+📌 **Test Assignment Details:** [TASK.md](TASK.md)
 
 ## 📌 Description
 **NetSeg API** is a REST API service for managing network segments and hosts, built with **Golang**, **Echo**, and **PostgreSQL**.
