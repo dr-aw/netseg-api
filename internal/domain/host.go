@@ -8,9 +8,9 @@ import (
 
 type Host struct {
 	ID        uint   `gorm:"primaryKey"`
-	IPAddress string `gorm:"not null"`
-	MAC       string `gorm:"unique;not null"`
-	Status    string `gorm:"not null"`
+	IPAddress string `gorm:"type:varchar(15);not null"`
+	MAC       string `gorm:"type:varchar(17);unique;not null"`
+	Status    bool   `gorm:"not null"`
 	SegmentID uint   `gorm:"not null;index"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
