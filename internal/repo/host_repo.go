@@ -10,6 +10,20 @@ type HostRepo struct {
 	db *gorm.DB
 }
 
+// Interface for writing
+type HostBaseRepository interface {
+	Create(host *domain.Host) error
+	Update(host *domain.Host) error
+}
+
+// Interface for reading
+type HostQueryRepository interface {
+	GetByIPAddressAndSegment(ip string, segmentID uint) (*domain.Host, error)
+	GetByMAC(mac string) (*domain.Host, error)
+	CountHostsBySegmentID(segmentID uint) (int, error)
+	GetAll() ([]domain.Host, error)
+}
+
 func NewHostRepo(db *gorm.DB) *HostRepo {
 	return &HostRepo{db: db}
 }

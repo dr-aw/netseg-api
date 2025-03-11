@@ -10,6 +10,20 @@ type NetSegmentRepo struct {
 	db *gorm.DB
 }
 
+// Interface for writing
+type NetSegmentBaseRepository interface {
+	Create(segment *domain.NetSegment) error
+	Update(segment *domain.NetSegment) error
+}
+
+// Interface for reading
+type NetSegmentQueryRepository interface {
+	GetByID(id uint) (*domain.NetSegment, error)
+	GetAll() ([]domain.NetSegment, error)
+	GetByCIDR(cidr string) (*domain.NetSegment, error)
+}
+
+
 func NewNetSegmentRepo(db *gorm.DB) *NetSegmentRepo {
 	return &NetSegmentRepo{db: db}
 }

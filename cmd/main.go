@@ -14,11 +14,16 @@ func main() {
 	db := repo.InitDB(cfg)
 	e := echo.New()
 
-	netSegRepo := repo.NewNetSegmentRepo(db)
-	hostRepo := repo.NewHostRepo(db)
+	netSegBaseRepo := repo.NewNetSegmentRepo(db)
+	netSegQueryRepo := repo.NewNetSegmentRepo(db)
+	hostBaseRepo := repo.NewHostRepo(db)
+	hostQueryRepo := repo.NewHostRepo(db)
 
-	netSegService := service.NewNetSegmentService(netSegRepo, hostRepo)
-	hostService := service.NewHostService(hostRepo, netSegService)
+	// ✅ Создаём `NetSegmentService` без `HostService`
+	netSegService := service.NewNetSegmentService(netSegBaseRepo, netSegQueryRepo, hostQueryRepo)
+
+	// ✅ `HostService` остаётся без изменений
+	hostService := service.NewHostService(hostBaseRepo, hostQueryRepo, netSegQueryRepo)
 
 	netSegHandler := handler.NewNetSegmentHandler(netSegService)
 	hostHandler := handler.NewHostHandler(hostService)

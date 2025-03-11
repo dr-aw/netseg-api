@@ -11,36 +11,36 @@ import (
 )
 
 type NetSegmentService struct {
-	repo     *repo.NetSegmentRepo
-	hostRepo *repo.HostRepo
+	baseRepo    repo.NetSegmentBaseRepository
+	queryRepo   repo.NetSegmentQueryRepository
+	hostQueryRepo	repo.HostQueryRepository
 }
 
-func NewNetSegmentService(netSegRepo *repo.NetSegmentRepo, hostRepo *repo.HostRepo) *NetSegmentService {
+func NewNetSegmentService(base repo.NetSegmentBaseRepository, query repo.NetSegmentQueryRepository, hostQuery repo.HostQueryRepository) *NetSegmentService {
 	return &NetSegmentService{
-		repo:     netSegRepo,
-		hostRepo: hostRepo,
+		baseRepo:  		base,
+		queryRepo: 		query,
+		hostQueryRepo: 	hostQuery,
 	}
 }
-
 
 func (s *NetSegmentService) CreateNetSegment(segment *domain.NetSegment) error {
 	if err := s.validateSegment(segment); err != nil {
 		return err
 	}
 
-	return s.repo.Create(segment)
+	return s.baseRepo.Create(segment)
 }
 
 func (s *NetSegmentService) GetAllNetSegments() ([]domain.NetSegment, error) {
-	if s.repo == nil {
+	if s.queryRepo == nil {
 		return nil, fmt.Errorf("repository is not initialized")
 	}
-	return s.repo.GetAll()
+	return s.queryRepo.GetAll()
 }
 
 func (s *NetSegmentService) UpdateNetSegment(segment *domain.NetSegment) error {
-
-	hostCount, err := s.hostRepo.CountHostsBySegmentID(segment.ID)
+	hostCount, err := s.hostQueryRepo.CountHostsBySegmentID(segment.ID)
 	if err != nil {
 		return fmt.Errorf("failed to count hosts in segment %d: %v", segment.ID, err)
 	}
@@ -54,11 +54,11 @@ func (s *NetSegmentService) UpdateNetSegment(segment *domain.NetSegment) error {
 	if err := s.validateSegment(segment); err != nil {
 		return err
 	}
-	return s.repo.Update(segment)
+	return s.baseRepo.Update(segment)
 }
 
 func (s *NetSegmentService) GetSegmentByID(id uint) (*domain.NetSegment, error) {
-	return s.repo.GetByID(id)
+	return s.queryRepo.GetByID(id)
 }
 
 func (s *NetSegmentService) validateSegment(segment *domain.NetSegment) error {
@@ -81,7 +81,7 @@ func (s *NetSegmentService) validateSegment(segment *domain.NetSegment) error {
 	}
 
 	// CIDR is unique
-	existingSegment, err := s.repo.GetByCIDR(segment.CIDR)
+	existingSegment, err := s.queryRepo.GetByCIDR(segment.CIDR)
 	if err == nil && existingSegment != nil && existingSegment.ID != segment.ID {
 		return fmt.Errorf("CIDR %s already exists", segment.CIDR)
 	}
